@@ -1,12 +1,130 @@
 INCLUDE Lib.inc
 .code
-; if dir is 0, draw line up, if dir is 1, draw line right
+
+;================================================================================
+
+drawSquare PROC USES eax,
+  color:DWORD, sidelen:DWORD, x:BYTE, y:BYTE
+  
+  invoke drawStraightLine,
+    color, sidelen, 0, x, y
+  invoke drawStraightLine,
+    color, sidelen, 1, x, y
+  mov al, BYTE PTR sidelen
+  dec al
+  add x, al
+  invoke drawStraightLine,
+    color, sidelen, 0, x, y
+  sub y, al
+  sub x, al
+  invoke drawStraightLine,
+    color, sidelen, 1, x, y
+
+  ret
+
+drawSquare ENDP
+
+;================================================================================
+
+drawRect PROC USES eax,
+  color:DWORD, widthlen:DWORD, heightlen:DWORD, x:BYTE, y:BYTE
+
+  invoke drawStraightLine,
+    color, heightlen, 0, x, y
+  invoke drawStraightLine,
+    color, widthlen, 1, x, y
+  mov al, BYTE PTR widthlen
+  dec al
+  add x, al
+  invoke drawStraightLine,
+    color, heightlen, 0, x, y
+  mov bl, BYTE PTR heightlen
+  dec bl
+  sub y, bl
+  sub x, al
+  invoke drawStraightLine,
+    color, widthlen, 1, x, y
+
+  ret
+
+drawRect ENDP
+
+;================================================================================
+
+fillRect PROC USES ecx,
+  color:DWORD, widthlen:DWORD, heightlen:DWORD, x:BYTE, y:BYTE
+
+  mov ecx, widthlen
+L1:
+  invoke drawStraightLine,
+    color, heightlen, 0, x, y
+  inc x
+  loop L1
+
+  ret
+
+fillRect ENDP
+
+fillSquare PROC USES ecx,
+  color:DWORD, sidelen:DWORD, x:BYTE, y:BYTE
+  
+  mov ecx, sidelen
+L1:
+  invoke drawStraightLine,
+    color, sidelen, 0, x, y
+  inc x
+  loop L1
+
+  ret
+
+fillSquare ENDP
+
+;================================================================================
+
+drawCheckerBoard PROC USES ebx ecx edx,
+  color1:DWORD, color2:DWORD, sqwidth:DWORD, sqheight:DWORD,
+  squares:DWORD, x:BYTE, y:BYTE
+  LOCAL flip:DWORD
+  mov flip, 0
+  
+  mov ecx, squares
+  jmp L3
+L1:
+  mov DWORD PTR y, ebx
+  mov dl, BYTE PTR sqwidth
+  add x, dl
+L3:
+  push ecx
+  movzx ebx, y
+  mov ecx, squares
+L2:
+  .IF flip == 0
+    invoke fillRect,
+      color1, sqwidth, sqheight, x, y
+    mov flip, 1
+  .ELSE
+    invoke fillRect,
+      color2, sqwidth, sqheight, x, y
+    mov flip, 0
+  .ENDIF
+  mov dl, BYTE PTR sqheight
+  sub y, dl
+  loop L2
+  xor flip, 01h
+  pop ecx
+  loop L1
+
+  ret
+
+drawCheckerBoard ENDP
+
+;================================================================================
+
 drawStraightLine PROC USES eax ecx ebx edx,
-  ;color:DWORD, len:DWORD, dir:BYTE, x:BYTE, y:BYTE
-  push ebp
-  mov ebp, esp
-  sub esp, 4
-  mov BYTE PTR [ebp-4], ' '
+  color:DWORD, len:DWORD, dir:BYTE, x:BYTE, y:BYTE
+  
+  LOCAL char:DWORD
+  mov char, '#'
   mov eax, color
   call SetTextColor
 
@@ -16,17 +134,16 @@ drawStraightLine PROC USES eax ecx ebx edx,
 L1:
   call Gotoxy
   push edx
-  push ecx
-  mov ecx, ebp
-  sub ecx, 4
-  mov edx, ecx
-  pop ecx
+  push eax
+  lea eax, char
+  mov edx, eax
+  pop eax
   call WriteString
   pop edx
 
   movzx ebx, dir
-  test ebx, 00h ;if zero, draw line up
-  jne x_increment;if zero, draw line right
+  test ebx, 01h ;if one, draw line right
+  jne x_increment;if not one, draw line up
   dec dh
   loop L1
   jmp endloop
@@ -38,8 +155,6 @@ x_increment:
 endloop:
   mov eax, white + black * 16
   call SetTextColor
-  mov esp, ebp
-  pop ebp
   ret
 
 drawStraightLine ENDP
