@@ -106,20 +106,33 @@ drawKing PROTO,
   y:BYTE
 
 drawPieces PROTO,
-  whitePieceColor:BYTE, whiteBorderColor:BYTE, blackPieceColor:BYTE, blackBorderColor:BYTE, whiteTileColor:BYTE, blackTileColor:BYTE, x:BYTE, y:BYTE
+  whitePieceColor:BYTE,
+  whiteBorderColor:BYTE,
+  blackPieceColor:BYTE,
+  blackBorderColor:BYTE,
+  whiteTileColor:BYTE,
+  blackTileColor:BYTE,
+  x:BYTE,
+  y:BYTE
 
 getPiece PROTO,
   pos:WORD,
   pPiece:PTR BYTE
 
 movePiece PROTO,
-  from:WORD, to:WORD
+  from:WORD,
+  to:WORD
 
 setPiece PROTO,
-  pos:WORD, piece:BYTE
+  pos:WORD,
+  piece:BYTE
 
 writeBottomRow PROTO,
-  tilewidth:BYTE, x:BYTE, y:BYTE
+  tilewidth:BYTE,
+  x:BYTE,
+  y:BYTE
  
 writeLeftColumn PROTO,
-  tileheight:BYTE, x:BYTE, y:BYTE
+  tileheight:BYTE,
+  x:BYTE,
+  y:BYTE

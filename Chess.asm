@@ -122,7 +122,7 @@ L1:
 printInfo ENDP
 
 fenReverse PROC
-  
+  xor board_view, 01h
   push ebp
   mov ebp, esp
   sub esp, 64
@@ -144,9 +144,9 @@ L1:
   mov edi, OFFSET fen+1
   rep movsb
 
-  mov cl, board_view
-  xor cl, 01h
-  mov board_view, cl
+  ;mov cl, board_view
+  ;xor cl, 01h
+  ;mov board_view, cl
 
   mov esp, ebp
   pop ebp
@@ -196,10 +196,10 @@ drawScreen PROC USES eax ebx,
   mov y, dl
   mov tilewidth, al
   invoke drawCheckerBoard,
-    board_view, white + white * 16, gray + gray * 16,
+    board_view, white + white * 16, green + green * 16,
     tilewidth, tileheight, 8, x, y
-  invoke drawPieces, yellow, black, black, yellow, white, gray, x, y
-  ;invoke drawPieces, white, black, black, white, yellow, gray, x, y
+  invoke drawPieces, yellow, black, black, yellow, white, green, x, y
+  ;invoke drawPieces, white, black, black, white, yellow, green, x, y
   invoke writeBottomRow, tilewidth, x, y
   invoke writeLeftColumn, tileheight, x, y
 
@@ -282,9 +282,7 @@ drawPieces PROC USES edx ecx ebx eax,
    whitePieceColor:BYTE, whiteBorderColor:BYTE, blackPieceColor:BYTE, blackBorderColor:BYTE, whiteTileColor:BYTE, blackTileColor:BYTE, x:BYTE, y:BYTE
 
   LOCAL tileColor:BYTE
-  mov tileColor, 1
-  mov al, board_view
-  xor tileColor, al
+  mov tileColor, 0
   mov dh, y
   mov dl, x
   inc dl
@@ -1324,11 +1322,11 @@ ENDM
 changePlayer MACRO
   push eax
   push ebx
-  call fenReverse ; flip board on move
   mov al, [fen]
   xor al, 01h
   mov ebx, OFFSET fen
   mov [ebx], al
+  call fenReverse ; flip board on move
   pop ebx
   pop eax
 ENDM

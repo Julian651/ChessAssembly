@@ -87,8 +87,8 @@ drawCheckerBoard PROC USES ebx ecx edx,
   squares:DWORD, x:BYTE, y:BYTE
   LOCAL flip:DWORD
   mov flip, 0
-  movzx ecx, viewas
-  xor flip, ecx
+  mov ecx, 01h
+  or flip, ecx
   
   mov ecx, squares
   jmp L3
